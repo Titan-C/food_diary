@@ -1,0 +1,6 @@
+---
+slots:
+  food_name:
+    - 'bier'
+    - 'schnitzel'
+    - 'pommes'

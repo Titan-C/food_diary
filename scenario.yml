@@ -1,0 +1,56 @@
+---
+include:
+  - intents.yml
+  - slots.yml
+scenario:
+  invocation: 'Food Diary'
+  name: 'Food Diary'
+  locale: de-DE
+  category: EDUCATION_AND_REFERENCE
+  examplePhrases:
+    - 'Alexa, öffne Ernährungstagebuch'
+  steps:
+
+
+    - name: Initial Step
+      entrypoint: true
+      actions:
+        - sendText: 'Was hast Du gegessen?'
+        - getInput:
+      next:
+        which_food: API Request
+        help: Help
+        AMAZON.CancelIntent: Exit
+        AMAZON.StopIntent: Exit
+        AMAZON.HelpIntent: Help
+
+    - name: API Request
+      actions:
+        - getUrl:
+            url: 'https://oqqg2nqhrd-dsn.algolia.net/1/indexes/foods?query={{food_name}}&x-algolia-application-id=OQQG2NQHRD&x-algolia-api-key=ed77ea09e034941bccd67e8a329cc251'
+        - setContext:
+            from: '{{ urlResponse.hits[0].portioncal | replace({"\"": ""}) }}'
+            to: food_name_response
+      next: Read Price
+    - name: Read Price
+      actions:
+        - sendText: '{{ food_name }} hat {{ food_name_response }} Kalorien. '
+        - sendText: 'Hast Du noch etwas gegessen?'
+        - getInput:
+      next:
+        next_coin: Initial Step
+        no_thanks: Exit
+        which_food: API Request
+
+    - name: Exit
+      entrypoint: true
+      actions:
+        - sendText: '{% if food_name is defined %}OK, next time just open Coin Cap to see the latest price of {{ food_name }}.{% endif %} {{ random(["Tschüss", "auf wiedersehen", "Goodbye", "bis dann"])}}'
+    - name: Help
+      entrypoint: true
+      actions:
+        - sendText: 'Sage einfach Dein Lebensmittel und ich rechne Dir die Kalorien aus?'
+        - getInput:
+      next:
+        which_food: API Request
+        no_thanks: Exit
