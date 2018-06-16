@@ -19,18 +19,12 @@ scenario:
         - sendText: 'Was hast Du gegessen?'
         - getInput:
       next:
+        total_energy_metabolism: total energy metabolism
         which_food: API Request
-        basal_metabolic_rate: basal metabolic rate
         help: Help
         AMAZON.CancelIntent: Exit
         AMAZON.StopIntent: Exit
         AMAZON.HelpIntent: Help
-
-    - name: Help
-      entrypoint: true
-      actions:
-        - sendText: 'Ich bin hier um dir deine ernährungsziele zu erreinchen.'
-      next: Initial Step
 
 
     - name: API Request
@@ -52,16 +46,44 @@ scenario:
         no_thanks: Exit
         which_food: API Request
 
-
-    - name: weight
+    - name: total energy metabolism
       actions:
-        - setContext:
-            from: >
-                {% if gender == 'männlich' %}{655.1+(9.6*gewicht)+(1.8*groesse)-(4.7*alter)}{% endif %}
-                {% if gender == 'weiblich' %}{66.4+(13.7*gewicht)+(5*groesse)-(6.8*alter)}{% endif %}
-            to: 'gewicht'
-        - sendText: 'Du bist {{gender}}'
-      next: Exit
+        - sendText: 'Jetzt helfe ich Dir das zu berechnen. '
+      next: gender
+
+    - name: gender
+      actions:
+        - sendText: 'Bist Du männlich oder weiblich? '
+        - getInput:
+      next:
+        gender: old step
+
+    - name: old step
+      actions:
+        - sendText: 'Wie alt bist Du? '
+        - getInput:
+      next:
+       old: weight step
+
+    - name: weight step
+      actions:
+        - sendText: 'Wieviel wiegst Du?'
+        - getInput:
+      next:
+        weight: height step
+
+    - name: height step
+      actions:
+        - sendText: 'Wie groß bist Du in Zentimeter?'
+        - getInput:
+      next:
+        height: aktivity_level step
+
+    - name: aktivity_level step
+      actions:
+        - sendText: 'Wie aktiv bist du geöwhnlich, sage leicht, normal, mäßig oder aktiv '
+        - getInput:
+      next: basal metabolic rate
 
     - name: basal metabolic rate
       actions:
@@ -71,7 +93,9 @@ scenario:
                 {% if gender == 'weiblich' %}{66.4+(13.7*gewicht)+(5*groesse)-(6.8*alter)}{% endif %}
             to: 'matabolic_rate'
         - sendText: 'Du bist {{gender}}'
-      next: Exit
+      next: total energy metabolism
+
+
 
     - name: Exit
       entrypoint: true
