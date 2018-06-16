@@ -11,12 +11,18 @@ scenario:
     - 'Alexa, öffne ernährungstagebuch'
     - 'Alexa, starte ernährungstagebuch'
   steps:
-
-
+    - name: Check if user has already total_energy
+      actions:
+       - compareContext:
+          var: '{% if total_energy|default(2000) != 0 %}true{%endif%}'
+          is_equal: 'true'
+      next:
+        'true': food_log
+        'false': Initial Step
     - name: Initial Step
       entrypoint: true
       actions:
-        - sendText: 'Was hast Du gegessen?'
+        - sendText: ' Hi! Schön dich kennenzulernen. Ich bin dein Food Diary Assistant und begleite dich bei deiner Ernährung. Ich sehe, dass du zum ersten Mal Food Diary benutzt. Bevor wir mit der Dokumentation deiner Ernährung starten können, brauche ich noch ein paar Informationen von dir.  Sage berechne Tageskalorien um anzufangen. '
         - getInput:
       next:
         total_energy_metabolism: total energy metabolism
@@ -25,26 +31,6 @@ scenario:
         AMAZON.CancelIntent: Exit
         AMAZON.StopIntent: Exit
         AMAZON.HelpIntent: Help
-
-
-    - name: API Request
-      actions:
-        - getUrl:
-            url: 'https://oqqg2nqhrd-dsn.algolia.net/1/indexes/foods?query={{food_name}}&x-algolia-application-id=OQQG2NQHRD&x-algolia-api-key=ed77ea09e034941bccd67e8a329cc251'
-        - setContext:
-            from: '{{ urlResponse.hits[0].portioncal | replace({"\"": ""}) }}'
-            to: food_name_response
-      next: Read Calories
-
-    - name: Read Calories
-      actions:
-        - sendText: '{{ food_name }} hat {{ food_name_response }} Kalorien. '
-        - sendText: 'Hast Du noch etwas gegessen?'
-        - getInput:
-      next:
-        next_coin: Initial Step
-        no_thanks: Exit
-        which_food: API Request
 
     - name: total energy metabolism
       actions:
@@ -60,47 +46,102 @@ scenario:
 
     - name: old step
       actions:
-        - sendText: 'Wie alt bist Du? '
+        - setContext:
+            from: '{{ gendername | lower }}'
+            to: gender_memory
+        - sendText: 'Du bist also {{gender_memory}} und wie alt bist Du? '
         - getInput:
       next:
        old: weight step
 
     - name: weight step
       actions:
-        - sendText: 'Wieviel wiegst Du?'
+        - setContext:
+            from: '{{ number }}'
+            to: age_memory
+        - sendText: 'Du bist also {{age_memory}} Jahre alt, wieviel wiegst Du?'
         - getInput:
       next:
         weight: height step
 
     - name: height step
       actions:
-        - sendText: 'Wie groß bist Du in Zentimeter?'
+        - setContext:
+            from: '{{ number }}'
+            to: weight_memory
+        - sendText: 'Du wiegst also {{weight_memory}} Kilogramm. Wie groß bist Du in Zentimeter?'
         - getInput:
       next:
         height: aktivity_level step
 
     - name: aktivity_level step
       actions:
-        - sendText: 'Wie aktiv bist du geöwhnlich, sage leicht, normal, mäßig oder aktiv '
+        - setContext:
+            from: '{{ number }}'
+            to: height_memory
+        - sendText: 'Du bist also {{height_memory}} Zentimeter groß. Wie aktiv bist du geöwhnlich, sage leicht, normal, mäßig oder aktiv '
         - getInput:
-      next: basal metabolic rate
+      next:
+       activity_level: summery
 
-    - name: basal metabolic rate
+    - name: summery
       actions:
         - setContext:
-            from: >
-                {% if gender == 'männlich' %}{655.1+(9.6*gewicht)+(1.8*groesse)-(4.7*alter)}{% endif %}
-                {% if gender == 'weiblich' %}{66.4+(13.7*gewicht)+(5*groesse)-(6.8*alter)}{% endif %}
-            to: 'matabolic_rate'
-        - sendText: 'Du bist {{gender}}'
-      next: total energy metabolism
+            from: '{{ activity_level_name | lower }}'
+            to: activity_level_memory
+        - sendText: 'Du bist {{gender_memory}}, jahre {{age_memory}}, wiegst {{weight_memory}} Kilogramm und bist {{height_memory}} Zentimeter groß und du bist {{activity_level_memory}} aktiv. '
+      next: total energy turnover
 
+    - name: total energy turnover
+      actions:
+        - setContext:
+           from: '{% if activity_level_memory == "leicht" %}1.2{% endif %}{% if activity_level_memory == "normal" %}1.4{% endif %}{% if activity_level_memory == "mäßig" %}1.6{% endif %}{% if activity_level_memory == "aktiv" %}1.8{% endif %}'
+           to: activity_rate
+        - setContext:
+           from: '{% if gendername == "männlich" %}{{(655.1+(9.6*weight_memory)+(1.8*height_memory)-(4.7*age_memory))*activity_rate|round}}{%endif%}{% if gendername == "weiblich" %}{{(66.4+(13.7*weight_memory)+(5*height_memory)-(6.8*age_memory))*activity_rate|round}}{%endif%}'
+           to: total_energy
+        - sendText: 'Dein Tageskalorienbedarf ist {{total_energy}} Kalorien. Wenn Du abnehmen möchtest, solltest Du unter diesen Tageskalorien bleiben.  '
+      next: food_log
 
+    - name: food_log
+      entrypoint: true
+      actions:
+        - sendText: 'Was hast Du gegessen? '
+        - getInput:
+      next:
+        which_food: API Request
+        help: Help
+        AMAZON.CancelIntent: Exit
+        AMAZON.StopIntent: Exit
+        AMAZON.HelpIntent: Help
+
+    - name: API Request
+      actions:
+        - getUrl:
+            url: 'https://oqqg2nqhrd-dsn.algolia.net/1/indexes/foods?query={{food_name}}&x-algolia-application-id=OQQG2NQHRD&x-algolia-api-key=ed77ea09e034941bccd67e8a329cc251'
+        - setContext:
+            from: '{{ urlResponse.hits[0].portioncal | replace({"\"": ""}) }}'
+            to: food_name_response
+      next: Read Calories
+
+    - name: Read Calories
+      actions:
+        - sendText: '{{ food_name }} hat {{ food_name_response }} Kalorien. '
+        - setContext:
+             from: '{{total_energy - food_name_response}}'
+             to: remain_calories
+        - sendText: 'Jetzt bleiben dir noch {{remain_calories}} Kalorien. '
+        - sendText: 'Hast Du noch etwas gegessen?'
+        - getInput:
+      next:
+        next_coin: Initial Step
+        no_thanks: Exit
+        which_food: API Request
 
     - name: Exit
       entrypoint: true
       actions:
-        - sendText: '{% if food_name is defined %}OK, next time just open Coin Cap to see the latest price of {{ food_name }}.{% endif %} {{ random(["Tschüss", "auf wiedersehen", "Goodbye", "bis dann"])}}'
+        - sendText: '{{ random(["Tschüss", "auf wiedersehen", "Goodbye", "bis dann"])}}'
 
     - name: Help
       entrypoint: true

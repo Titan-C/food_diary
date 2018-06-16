@@ -1,22 +1,25 @@
 ---
 slots:
- food_name:
-   - 'bier'
-   - 'schnitzel'
-   - 'pommes'
- gender:
-   - 'mann'
-   - 'frau'
-   - 'männlich'
-   - 'weiblich'
- old:
-   - '{numbers}'
- heigth:
-   - '{numbers}'
- weigth:
-   - '{numbers}'
- aktivity_level:
-   -'leicht'
-   -'normal'
-   -'mäßig'
-   -'aktiv'
+
+  food_name:
+    - 'bier'
+    - 'schnitzel'
+    - 'pommes'
+    - 'apfel'
+    - 'banane'
+    - 'brötchen'
+    - 'pizza'
+    - 'döner'
+    - 'salat'
+    - 'milch'
+
+  gendername:
+    - 'mann'
+    - 'frau'
+    - 'männlich'
+    - 'weiblich'
+  activity_level_name:
+    - 'leicht'
+    - 'normal'
+    - 'mäßig'
+    - 'aktiv'

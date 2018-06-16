@@ -1,23 +1,46 @@
 ---
 intents:
- which_food:
-   - 'wie viel kalorien hat {food_name}'
-   - 'die kalorien von {food_name} bitte'
-   - 'sage mir die kalorien von {food_name}'
-   - '{food_name} kalorien'
+  which_food:
+    - 'wie viel kalorien hat {food_name}'
+    - 'die kalorien von {food_name} bitte'
+    - 'sage mir die kalorien von {food_name}'
+    - '{food_name} kalorien'
+    - 'ich habe ein {food_name} gegessen'
+    - 'ich habe eine {food_name} gegessen'
+    - '{food_name}'
 
- basal_metabolic_rate:
-   - 'Wie viel Kalorien brauche ich {gender}'
 
- next_coin:
-   - 'ja'
-   - 'noch etwas'
-   - 'ja bitte'
-   - 'sicher'
-   - 'Yeah'
- no_thanks:
-   - 'No'
-   - 'Nein'
-   - 'Nope'
- help:
-   - 'help'
+  total_energy_metabolism:
+    - 'Wie viel Kalorien brauche ich'
+    - 'wie viel kann ich essen'
+    - 'berechne Tageskalorien'
+    - 'kalorienbedarf'
+    - 'rechne meinen kalorienbedarf aus'
+
+  gender:
+    - '{gendername}'
+    - 'ich bin {gendername}'
+  old:
+    - '{number} jahre'
+    - 'ich bin {number} jahre alt'
+  weight:
+    - '{number} kilogramm'
+    - 'ich wiege {number} kilogramm'
+  height:
+    - '{number} zentimeter'
+    - 'ich bin {number} Zentimeter groß'
+  activity_level:
+    - 'ich bin {activity_level_name} aktiv'
+    - '{activity_level_name}'
+  next_coin:
+    - 'ja'
+    - 'noch etwas'
+    - 'ja bitte'
+    - 'sicher'
+    - 'Yeah'
+  no_thanks:
+    - 'No'
+    - 'Nein'
+    - 'Nope'
+  help:
+    - 'help'
