@@ -8,7 +8,8 @@ scenario:
   locale: de-DE
   category: EDUCATION_AND_REFERENCE
   examplePhrases:
-    - 'Alexa, öffne Ernährungstagebuch'
+    - 'Alexa, öffne ernährungstagebuch'
+    - 'Alexa, starte ernährungstagebuch'
   steps:
 
 
@@ -19,10 +20,18 @@ scenario:
         - getInput:
       next:
         which_food: API Request
+        basal_metabolic_rate: basal metabolic rate
         help: Help
         AMAZON.CancelIntent: Exit
         AMAZON.StopIntent: Exit
         AMAZON.HelpIntent: Help
+
+    - name: Help
+      entrypoint: true
+      actions:
+        - sendText: 'Ich bin hier um dir deine ernährungsziele zu erreinchen.'
+      next: Initial Step
+
 
     - name: API Request
       actions:
@@ -31,8 +40,9 @@ scenario:
         - setContext:
             from: '{{ urlResponse.hits[0].portioncal | replace({"\"": ""}) }}'
             to: food_name_response
-      next: Read Price
-    - name: Read Price
+      next: Read Calories
+
+    - name: Read Calories
       actions:
         - sendText: '{{ food_name }} hat {{ food_name_response }} Kalorien. '
         - sendText: 'Hast Du noch etwas gegessen?'
@@ -42,10 +52,32 @@ scenario:
         no_thanks: Exit
         which_food: API Request
 
+
+    - name: weight
+      actions:
+        - setContext:
+            from: >
+                {% if gender == 'männlich' %}{655.1+(9.6*gewicht)+(1.8*groesse)-(4.7*alter)}{% endif %}
+                {% if gender == 'weiblich' %}{66.4+(13.7*gewicht)+(5*groesse)-(6.8*alter)}{% endif %}
+            to: 'gewicht'
+        - sendText: 'Du bist {{gender}}'
+      next: Exit
+
+    - name: basal metabolic rate
+      actions:
+        - setContext:
+            from: >
+                {% if gender == 'männlich' %}{655.1+(9.6*gewicht)+(1.8*groesse)-(4.7*alter)}{% endif %}
+                {% if gender == 'weiblich' %}{66.4+(13.7*gewicht)+(5*groesse)-(6.8*alter)}{% endif %}
+            to: 'matabolic_rate'
+        - sendText: 'Du bist {{gender}}'
+      next: Exit
+
     - name: Exit
       entrypoint: true
       actions:
         - sendText: '{% if food_name is defined %}OK, next time just open Coin Cap to see the latest price of {{ food_name }}.{% endif %} {{ random(["Tschüss", "auf wiedersehen", "Goodbye", "bis dann"])}}'
+
     - name: Help
       entrypoint: true
       actions:
