@@ -1,20 +1,23 @@
 ---
 intents:
-  which_food:
-    - 'wie viel kalorien hat {food_name}'
-    - 'die kalorien von {food_name} bitte'
-    - 'sage mir die kalorien von {food_name}'
-    - '{food_name} kalorien'
+ which_food:
+   - 'wie viel kalorien hat {food_name}'
+   - 'die kalorien von {food_name} bitte'
+   - 'sage mir die kalorien von {food_name}'
+   - '{food_name} kalorien'
 
-  next_coin:
-    - 'ja'
-    - 'noch etwas'
-    - 'ja bitte'
-    - 'sicher'
-    - 'Yeah'
-  no_thanks:
-    - 'No'
-    - 'Nein'
-    - 'Nope'
-  help:
-    - 'help'
+ basal_metabolic_rate:
+   - 'Wie viel Kalorien brauche ich {gender}'
+
+ next_coin:
+   - 'ja'
+   - 'noch etwas'
+   - 'ja bitte'
+   - 'sicher'
+   - 'Yeah'
+ no_thanks:
+   - 'No'
+   - 'Nein'
+   - 'Nope'
+ help:
+   - 'help'
