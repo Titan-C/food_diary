@@ -1,0 +1,7 @@
+#+TITLE:  Food diary voice assistant experiment
+#+AUTHOR: Óscar Nájera
+#+EMAIL:  hi@oscarnajera.com
+
+During the Berlin Talk to me hackathon. The food diary team tried to build
+a voice assistant using bottalk.de to accompany German people registering
+their food intake and daily calories consumption.
