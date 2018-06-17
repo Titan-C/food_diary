@@ -1,6 +1,5 @@
 ---
 slots:
-
   food_name:
     - 'bier'
     - 'schnitzel'
@@ -12,6 +11,9 @@ slots:
     - 'döner'
     - 'salat'
     - 'milch'
+    - 'spaghetti'
+    - 'kuchen'
+    - 'cola'
 
   gendername:
     - 'mann'

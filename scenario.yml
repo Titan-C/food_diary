@@ -8,13 +8,13 @@ scenario:
   locale: de-DE
   category: EDUCATION_AND_REFERENCE
   examplePhrases:
-    - 'Alexa, öffne ernährungstagebuch'
-    - 'Alexa, starte ernährungstagebuch'
+    - 'Alexa, öffne food diary'
+    - 'Alexa, starte food diary'
   steps:
     - name: Check if user has already total_energy
       actions:
        - compareContext:
-          var: '{% if total_energy|default(2000) != 0 %}true{%endif%}'
+          var: '{% if ref_total_energy|default(0) != 0 %}true{%endif%}'
           is_equal: 'true'
       next:
         'true': food_log
@@ -22,7 +22,7 @@ scenario:
     - name: Initial Step
       entrypoint: true
       actions:
-        - sendText: ' Hi! Schön dich kennenzulernen. Ich bin dein Food Diary Assistant und begleite dich bei deiner Ernährung. Ich sehe, dass du zum ersten Mal Food Diary benutzt. Bevor wir mit der Dokumentation deiner Ernährung starten können, brauche ich noch ein paar Informationen von dir.  Sage berechne Tageskalorien um anzufangen. '
+        - sendText: ' Hi! Schön dich kennenzulernen. Ich bin dein Food Diary Assistant und begleite dich bei deiner Ernährung. Ich sehe, dass du zum ersten Mal Food Diary benutzt. Bevor wir mit der Dokumentation deiner Ernährung starten können, brauche ich noch ein paar Informationen von dir.  Sage starte um anzufangen. '
         - getInput:
       next:
         total_energy_metabolism: total energy metabolism
@@ -34,7 +34,7 @@ scenario:
 
     - name: total energy metabolism
       actions:
-        - sendText: 'Jetzt helfe ich Dir das zu berechnen. '
+        - sendText: 'Jetzt helfe ich Dir deinen Kalorienbedarf zu berechnen. '
       next: gender
 
     - name: gender
@@ -79,17 +79,17 @@ scenario:
         - setContext:
             from: '{{ number }}'
             to: height_memory
-        - sendText: 'Du bist also {{height_memory}} Zentimeter groß. Wie aktiv bist du geöwhnlich, sage leicht, normal, mäßig oder aktiv '
+        - sendText: 'Ok. Wie aktiv bist du gewöhnlich, sage leicht, normal, mäßig oder aktiv '
         - getInput:
       next:
-       activity_level: summery
+        activity_level: summery
 
     - name: summery
       actions:
         - setContext:
             from: '{{ activity_level_name | lower }}'
             to: activity_level_memory
-        - sendText: 'Du bist {{gender_memory}}, jahre {{age_memory}}, wiegst {{weight_memory}} Kilogramm und bist {{height_memory}} Zentimeter groß und du bist {{activity_level_memory}} aktiv. '
+        - sendText: 'Du bist also {{activity_level_memory}} aktiv. Ich habe alle wichtigen Daten gespeichert. '
       next: total energy turnover
 
     - name: total energy turnover
@@ -100,7 +100,10 @@ scenario:
         - setContext:
            from: '{% if gendername == "männlich" %}{{(655.1+(9.6*weight_memory)+(1.8*height_memory)-(4.7*age_memory))*activity_rate|round}}{%endif%}{% if gendername == "weiblich" %}{{(66.4+(13.7*weight_memory)+(5*height_memory)-(6.8*age_memory))*activity_rate|round}}{%endif%}'
            to: total_energy
-        - sendText: 'Dein Tageskalorienbedarf ist {{total_energy}} Kalorien. Wenn Du abnehmen möchtest, solltest Du unter diesen Tageskalorien bleiben.  '
+        - sendText: 'Dein Tageskalorienbedarf sind {{total_energy|round}} Kalorien. Wenn Du abnehmen möchtest, empfehle ich dir unter diesen Tageskalorien zu bleiben.'
+        - setContext:
+           from: '{{ total_energy }}'
+           to: ref_total_energy
       next: food_log
 
     - name: food_log
@@ -110,10 +113,21 @@ scenario:
         - getInput:
       next:
         which_food: API Request
+        total_energy_metabolism: total energy metabolism
+        neuen_tag: Calories restart
         help: Help
         AMAZON.CancelIntent: Exit
         AMAZON.StopIntent: Exit
         AMAZON.HelpIntent: Help
+
+    - name: Calories restart
+      actions:
+        - setContext:
+           from: '{{ ref_total_energy }}'
+           to: total_energy
+        - sendText: 'Du fängst heute neu an. Versuche unter {{total_energy|round}} Kalorien zu bleiben.'
+      next: food_log
+
 
     - name: API Request
       actions:
@@ -130,18 +144,21 @@ scenario:
         - setContext:
              from: '{{total_energy - food_name_response}}'
              to: remain_calories
-        - sendText: 'Jetzt bleiben dir noch {{remain_calories}} Kalorien. '
+        - sendText: '{% if remain_calories <= 0 %}du hast heute zu viel gegessen ab jetzt nur noch Wasser trinken.{% else %}Jetzt bleiben dir noch {{remain_calories|round}} Kalorien.{% endif %}'
+        - setContext:
+             from: '{{remain_calories|round}}'
+             to: total_energy
         - sendText: 'Hast Du noch etwas gegessen?'
         - getInput:
       next:
-        next_coin: Initial Step
         no_thanks: Exit
         which_food: API Request
+        total_energy_metabolism: total energy metabolism
 
     - name: Exit
       entrypoint: true
       actions:
-        - sendText: '{{ random(["Tschüss", "auf wiedersehen", "Goodbye", "bis dann"])}}'
+        - sendText: '{{ random(["Tschüss", "auf wiedersehen", "Goodbye", "bis dann"])}}. Denke daran du bist was du isst.'
 
     - name: Help
       entrypoint: true

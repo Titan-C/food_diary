@@ -16,6 +16,11 @@ intents:
     - 'berechne Tageskalorien'
     - 'kalorienbedarf'
     - 'rechne meinen kalorienbedarf aus'
+    - 'fang an'
+    - 'starte'
+
+  neuen_tag:
+    - 'starte neuen tag'
 
   gender:
     - '{gendername}'
@@ -23,12 +28,15 @@ intents:
   old:
     - '{number} jahre'
     - 'ich bin {number} jahre alt'
+    - '{number}'
   weight:
     - '{number} kilogramm'
     - 'ich wiege {number} kilogramm'
+    - '{number}'
   height:
     - '{number} zentimeter'
     - 'ich bin {number} Zentimeter groß'
+    - '{number}'
   activity_level:
     - 'ich bin {activity_level_name} aktiv'
     - '{activity_level_name}'
