@@ -2,6 +2,55 @@
 #+AUTHOR: Óscar Nájera
 #+EMAIL:  hi@oscarnajera.com
 
-During the Berlin Talk to me hackathon. The food diary team tried to build
-a voice assistant using bottalk.de to accompany German people registering
-their food intake and daily calories consumption.
+This is a prototype developed during the Talk to me Berlin hackathon.
+
+* Idea: A food diary
+A voice assistant that keeps you informed and helps you with your food
+choices based on your personal goals. Food is an important part of a
+healthy lifestyle, and many people struggle with keeping track of their
+eating habits.
+
+* Milestones
+In the scope of a Hackathon few things can achieved. This project
+implements a German voice assistant, that helps you:
+
+- Determine your daily caloric consumption need.
+- Query the caloric content of multiple food servings.
+- Subtract from your daily caloric allowance, each time you enter a food
+  serving.
+
+* Implementation
+
+This project experimented with the following technologies.
+
+- [[Bottalk.de]] :: Allows to create Alexa Skills and Google Assistant Actions
+                with a simple markup language.
+- [[Algolia.com]] :: Search technology which allowed to index and query our
+                 food database.
+* Trying it out
+- Get an account on [[bottalk.de]]
+- Make a new project in German language
+- Upload all YAML files from this repo
+- Deploy the assistant to you preferred platform for testing
+
+* License
+Food Diary voice assistant
+Copyright (C) 2018 Óscar Nájera, Sammy Zimmermanns
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see [[https://www.gnu.org/licenses/]].
+
+* Disclaimer
+This is a prototype to evaluate tools for voice assistant technologies
+tested on a meaningful idea for the developers. I does not provide in any
+way nutritional advice.
